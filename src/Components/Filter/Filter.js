@@ -2,7 +2,7 @@ import react, { Component } from "react";
 import propTypes from "prop-types";
 import shortid from "shortid";
 
-const Filter = ({ onChange }) => {
+const Filter = ({ onChange, contacts }) => {
   const a = (e) => {
     onChange(e.target.value);
   };

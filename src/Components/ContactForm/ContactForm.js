@@ -1,8 +1,11 @@
 import react, { useState, useEffect } from "react";
 import shortid from "shortid";
 import s from "./ContactForm.module.css";
+import { useAddContactMutation } from "../API/contactAPI";
 
-export default function ContactForm({ addContact, compairContacts }) {
+export default function ContactForm({ compairContacts }) {
+  const [addContact, { isLoading }] = useAddContactMutation();
+
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
 
@@ -11,7 +14,7 @@ export default function ContactForm({ addContact, compairContacts }) {
     setNumber("");
   };
 
-  const onSumbitButton = (e) => {
+  const onSumbitButton = async (e) => {
     e.preventDefault();
     if (name === "" && number === "") {
       alert("Введите имя и номер");
@@ -28,8 +31,13 @@ export default function ContactForm({ addContact, compairContacts }) {
     if (compairContacts(name)) {
       return alert(`${name} is already in contacts`);
     }
+    let newContact = { name: name, number: number };
+    try {
+      await addContact(newContact);
+    } catch {
+      console.log("не получилось добавить");
+    }
 
-    addContact(name, number);
     reset();
   };
 

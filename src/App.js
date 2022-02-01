@@ -13,6 +13,7 @@ import {
   getContacts,
   getValueFilter,
   getVisibleContacts,
+  getContactsA,
 } from "./Components/redux/contact-selectors";
 import {
   useFetchContactQuery,
@@ -22,40 +23,48 @@ import {
 
 export default function App() {
   const { data, isFetching } = useFetchContactQuery();
-  const [addContact, { isLoading }] = useAddContactMutation();
   const [deleteContact] = useDeleteContactMutation();
+  const filter = useSelector(getValueFilter);
+  const getVisibleContacts = (contacts) => {
+    if (filter === "") return contacts;
+    const normalizedFilter = filter.toLowerCase();
+
+    return contacts.filter(({ name }) =>
+      name.toLowerCase().includes(normalizedFilter)
+    );
+  };
+  const filterStore = getVisibleContacts(data);
 
   console.log(data);
-  const contacts = useSelector(getContacts);
-  const filterStore = useSelector(getVisibleContacts);
-
-  console.log("c", contacts);
+  console.log(isFetching);
+  console.log("c", data);
   console.log("f", filterStore);
 
   const dispatch = useDispatch();
-
-  // const onDeleteContact = (id) => dispatch(deleteContact(id));
   const onChangeFilter = (e) => dispatch(changeFilter(e));
 
   function compairContacts(e) {
-    if (!contacts) return;
-    if (contacts.some(({ name }) => name === e)) {
+    if (!data) return;
+    if (data.some(({ name }) => name === e)) {
       return true;
     }
   }
 
   return (
     <div className={s.app}>
-      <ContactForm addContact={addContact} compairContacts={compairContacts} />
+      <ContactForm compairContacts={compairContacts} />
       <h2>Contacts</h2>
-      <Filter onChange={onChangeFilter} />
+      <Filter onChange={onChangeFilter} contacts={data} />
       <ContactList
         deleteContact={deleteContact}
         filteredContacts={filterStore}
+        isFetching={isFetching}
       />
     </div>
   );
 }
+
+// export default contactFromB
 // const getVisibleContacts = async () => {
 //   const normalizedFilter = filter.toLowerCase();
 //   try {

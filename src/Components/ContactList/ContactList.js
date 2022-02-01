@@ -3,25 +3,33 @@ import propTypes from "prop-types";
 import shortid from "shortid";
 import s from "./ContactList.module.css";
 
-export default function ContactList({ filteredContacts, deleteContact }) {
+export default function ContactList({
+  filteredContacts,
+  deleteContact,
+  isFetching,
+}) {
   return (
     <>
       <ul className={s.contactList}>
+        {isFetching && <h1>Загружаю</h1>}
         {filteredContacts
           ? filteredContacts.map((contacts) => (
               <li
                 className={s.contactList__item}
-                key={shortid.generate()}
+                key={contacts.id}
                 id={contacts.id}
-                onClick={(e) => {
+                onClick={async (e) => {
                   if (e.target.nodeName !== "BUTTON") {
                     return;
                   }
-                  deleteContact(e.currentTarget.id);
-                  console.log(e.currentTarget.id);
+                  try {
+                    await deleteContact(e.currentTarget.id);
+                  } catch {
+                    console.log("не получилось удалить");
+                  }
                 }}
               >
-                {contacts.name}: {contacts.phone}
+                {contacts.name}: {contacts.number}
                 <button type="button" className={s.contactList__button}>
                   Delete
                 </button>
